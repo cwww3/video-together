@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+</head>
+
+<body>
+
+  <video id="myVideo" class="video-js">
+  </video>
+
+</body>
+<script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
+<script>
+  window.Cw = true
+
+  var player = videojs('myVideo', {
+    controls: true, // 是否显示控制条
+    // poster: './icon/favicon-16x16.png', // 视频封面图地址
+    preload: 'auto',
+    autoplay: 'muted',
+    fluid: true, // 自适应宽高
+    language: 'zh-CN', // 设置语言
+    muted: false, // 是否静音
+    inactivityTimeout: false,
+    // sources: [
+    // {
+    //     src: 'https://svip.high23-playback.com/20240602/13986_a397e1ae/index.m3u8',
+    //     type: 'application/x-mpegURL'
+    //   }
+    // ]
+
+  }, function () {
+    console.log('视频可以播放了', this);
+  });
+
+
+  var data = {
+    src: '{{ .url }}',
+    type: 'application/x-mpegURL'
+  };
+  player.src(data);
+
+  const v = document.querySelector('#myVideo video')
+  console.log("video", v)
+
+  // v.addEventListener('timeupdate', () => {
+  // // 在这里处理进度条变更的操作
+  //   console.log('播放进度发生变化');
+  // });
+  let ready = false;
+  v.addEventListener('loadedmetadata', () => {
+    ready = true
+    // v.currentTime = 60 * 15
+  })
+
+  const rid = "{{ .rid }}"
+  const API = "{{ .api }}"
+  const diff = "{{ .diff }}"
+  const dd = diff === '' ? 0.0 : parseFloat(diff)
+  console.log("dd",dd)
+
+  setInterval(() => {
+    if (ready) {
+      fetch(API + "/progress/" + rid, {
+        method: 'GET'
+      })
+        .then(response => response.json())
+        .then(
+          (data) => {
+            const d = parseFloat(data.currentTime)
+            const unixMill = parseInt(data.unixMill)
+            let now = Date.now()
+            let current = Math.floor(now - unixMill) / 1000 + d
+            console.log("data", data, "should current", current, "now current", v.currentTime, "dirr", Math.abs(current - v.currentTime), Math.abs(current - v.currentTime) > 0.01)
+            if (d > 0 && Math.abs(current - v.currentTime) > 0.01) {
+              console.log("update currentTime", v.currentTime, current + dd)
+              v.currentTime = current + dd
+              // setTimeout(() => {
+              //   console.log("update currentTime", v.currentTime, Math.ceil(current))
+              //   v.currentTime = Math.ceil(current)
+              // }, (Math.ceil(v.current) - current) * 1000)
+            }
+          }
+        )
+        .catch(error => console.error('出错了:', error));
+    }
+  }, 5000)
+
+</script>
+
+</html>

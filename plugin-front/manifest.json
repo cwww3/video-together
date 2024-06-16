@@ -1,0 +1,38 @@
+{
+    "name": "cw",
+    "description": "Watch video together",
+    "version": "0.0.1",
+    "manifest_version": 3,
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "extension.js"
+            ]
+        },
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "preInjected.js"
+            ],
+            "run_at": "document_start",
+            "world": "MAIN"
+        }
+    ],
+    "background": {
+        "service_worker": "service-worker.js",
+        "type": "module"
+      },
+    "permissions": [
+        "storage",
+        "unlimitedStorage"
+    ],
+    "action": {
+        "default_icon": "plugin.png"
+    }
+}
+
