@@ -1,6 +1,6 @@
 (async function () {
     if (window.location.href.includes('/file/')) {
-        return 
+        return
     }
 
     const API = 'http://localhost:8080'
@@ -8,10 +8,13 @@
 
     const button = document.createElement('button')
     button.textContent = '点击复制分享连接'
-    button.style.display = 'none';
+    button.style.display = 'none'
     button.id = "cwButton"
-    button.style.backgroundColor = 'green';
-    button.style.color = 'black';
+    button.style.backgroundColor = 'green'
+    button.style.color = 'black'
+    button.style.position = 'fixed'
+    button.style.bottom = '0'
+    button.style.right = '0'
 
     button.addEventListener('click', () => {
         const textToCopy = API + "/file/" + rid
